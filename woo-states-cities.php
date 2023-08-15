@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Plugin Name: woo states and cities
@@ -30,6 +29,10 @@ require (ABSPATH.'/wp-content/plugins/woo-states-cities/vendor/autoload.php');
 
 
 // Get the API client and construct the service object.
+
+// $file = fopen('credentials.json','w');
+// fwrite($file, get_option('credentials_file') );
+//  fclose($file);
 
 
 function getClient(){
@@ -213,8 +216,8 @@ function woo_settings_page($links)
 add_action( 'admin_menu', 'woo_menu' );
 function woo_menu() {
     add_menu_page(
-        'woo', // page title
-        'woo', // menu title
+        'Woocommerce states and cities', // page title
+        'Woocommerce states and cities', // menu title
         'manage_options', // permisions
         'woo', // slug
         'woo_options_page', // page function
@@ -243,15 +246,20 @@ function woo_register_settings() {
     register_setting('woo_options_group', 'woo_enable_cities');
 }
 
-// if (isset($_POST["credentials_file"])) {
-//     $upload_dir   = wp_upload_dir();
-//     if (empty( $upload_dir['basedir'] ) ) return;
-//     $yy = $upload_dir['basedir'];
-//     $credintials_dirname = $upload_dir['basedir'].'/credintials';
-//     if ( ! file_exists( $credintials_dirname ) ) {
-//         wp_mkdir_p( $credintials_dirname );
-//     }
-
+if (isset($_POST["credentials_file"])) {
+    //  $upload_dir   = wp_upload_dir();
+    // if (empty( $upload_dir['basedir'] ) ) return;
+    // $yy = $upload_dir['basedir'];
+    // $credintials_dirname = $upload_dir['basedir'].'/credintials';
+    // if ( ! file_exists( $credintials_dirname ) ) {
+    //     wp_mkdir_p( $credintials_dirname );
+    // }
+    
+    $path ='credentials.json';
+    $file = fopen($path,'w');
+    fwrite($file, get_option('credentials_file') );
+    fclose($file);
+}
 
   
 //     if (move_uploaded_file($_FILES["credentials_file"]["tmp_name"], $credintials_dirname.'/credintials.json')) {
@@ -262,29 +270,12 @@ function woo_register_settings() {
    
 // }
 
-if (isset($_POST["credentials_file"])) {
-    $upload_dir   = wp_upload_dir();
-    if (empty($upload_dir['basedir'])) return;
-    $credentials_dirname = $upload_dir['basedir'].'/credentials';
-    if (!file_exists($credentials_dirname)) {
-        wp_mkdir_p($credentials_dirname);
-    }
-    
-    $target_file = $credentials_dirname . '/credentials.json';
-    if (move_uploaded_file($_FILES["credentials_file"]["tmp_name"], $target_file)) {
-        echo "The file ". htmlspecialchars(basename($_FILES["credentials_file"]["name"])). " has been uploaded.";
-    } else {
-        echo "Sorry, there was an error uploading your file: " . $_FILES["credentials_file"]["error"];
-    }
-}
-
-
 
 
 function woo_options_page() { ?>
     <div class="wrap">
         <h2>woo Settings</h2>
-        <form method="post" action="options.php" enctype="multipart/form-data" >
+        <form method="post" action="options.php"  >
             <?php settings_fields('woo_options_group'); ?>
             <?php do_settings_sections( 'woo_options_group' ); ?>
 
@@ -305,7 +296,9 @@ function woo_options_page() { ?>
                 <tr>
                     <th><label for="credentials_file">Google credentials file:</label></th>
                     <td>
-                        <input type="file" name="credentials_file" id="credentials_file" >
+                        <textarea class="regular-text" name="credentials_file" id="credentials_file" style ="height:150px">
+                            <?php echo get_option('credentials_file'); ?>
+                        </textarea>
                     </td>
                 </tr>
                 <tr>
@@ -333,10 +326,6 @@ function woo_options_page() { ?>
         </div>
         <?php 
         
-         
-       
         
-    
-    
-    
-    } ?>
+    } 
+    ?>
