@@ -15,13 +15,21 @@
 
 require (ABSPATH.'/wp-content/plugins/WooGeoZones/vendor/autoload.php');
 
+
+    $upload_dir   = wp_upload_dir();
+    if (empty($upload_dir['basedir'])) return;
+    $credentials_dirname = $upload_dir['basedir'].'/credentials';
+    if (!file_exists($credentials_dirname)) {
+        wp_mkdir_p($credentials_dirname);
+    }
+
 function getClient(){
     try{
         $client = new Google_Client();
         $client->setApplicationName(get_option('app_name'));
         $client->setScopes(Google_Service_Sheets::SPREADSHEETS);
         //PATH TO JSON FILE DOWNLOADED FROM GOOGLE CONSOLE FROM STEP 7
-        $client->setAuthConfig(ABSPATH . '/credentials.json'); 
+        $client->setAuthConfig(ABSPATH . 'wp-content/uploads/credentials/credentials.json'); 
         $client->setAccessType('offline');
         return $client;
     }
@@ -266,7 +274,7 @@ function wgz_menu() {
         'Woo Geo Zones', // page title
         'Woo Geo Zones', // menu title
         'manage_options', // permisions
-        'wgz', // slug
+        'WooGeoZones', // slug
          'wgz_options_page', // page function
         //  plugin_dir_url( __FILE__ ).'/img/favicon.png',// logo
         //  56 // menu position
@@ -297,7 +305,7 @@ function wgz_register_settings() {
 if (isset($_POST["credentials_file"])) {
     
     
-    $file = fopen(ABSPATH.'credentials.json','w');
+    $file = fopen(ABSPATH.'wp-content/uploads/credentials/credentials.json','w');
     fwrite($file, get_option('credentials_file') );
     fclose($file);
 }
@@ -305,7 +313,7 @@ if (isset($_POST["credentials_file"])) {
 
 function wgz_options_page() { ?>
     <div class="wrap">
-        <h2>wgz Settings</h2>
+        <h2>WooGeoZones Settings</h2>
         <form method="post"   >
             <?php settings_fields('wgz_options_group'); ?>
             <?php do_settings_sections( 'wgz_options_group' ); ?>
@@ -364,7 +372,8 @@ function wgz_options_page() { ?>
             <?php submit_button(); ?>
 
         </div>
+       
         <?php 
-         
-    } 
+    }
+
     ?>
