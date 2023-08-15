@@ -16,6 +16,7 @@
 require (ABSPATH.'/wp-content/plugins/WooGeoZones/vendor/autoload.php');
 
 
+// credentials file create
     $upload_dir   = wp_upload_dir();
     if (empty($upload_dir['basedir'])) return;
     $credentials_dirname = $upload_dir['basedir'].'/credentials';
@@ -375,5 +376,5 @@ function wgz_options_page() { ?>
        
         <?php 
     }
-
+    
     ?>
