@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: woo states and cities
+ * Plugin Name: Woo Geo Zones
  * Description: WooCommerce Plugin to replace countries and cities with drive google cheets
  * Author: Motaweroon
  * Author URI: https://Motaweroon.com/
@@ -13,36 +13,14 @@
  */
 
 
-
-
-//require (ABSPATH. '/vendor/autoload.php');
-require (ABSPATH.'/wp-content/plugins/woo-states-cities/vendor/autoload.php');
-
-
-// function createCredentialsFolder() {
-//     $credentialsDir = ABSPATH . '/wp-content/credentials';
-    
-//     if (!file_exists($credentialsDir)) {
-//         mkdir($credentialsDir, 0755, true);
-//     }
-// }
-
-
-// Get the API client and construct the service object.
-
-// $file = fopen('credentials.json','w');
-// fwrite($file, get_option('credentials_file') );
-//  fclose($file);
-
+require (ABSPATH.'/wp-content/plugins/WooGeoZones/vendor/autoload.php');
 
 function getClient(){
     try{
-        // $path = get_option('credentials_file');
         $client = new Google_Client();
         $client->setApplicationName(get_option('app_name'));
         $client->setScopes(Google_Service_Sheets::SPREADSHEETS);
         //PATH TO JSON FILE DOWNLOADED FROM GOOGLE CONSOLE FROM STEP 7
-        //if(file_exists($path)){$client->setAuthConfig($path);}
         $client->setAuthConfig(ABSPATH . '/credentials.json'); 
         $client->setAccessType('offline');
         return $client;
@@ -52,23 +30,6 @@ function getClient(){
     }
    
 }
-
-// try {
-//     $client = getClient();
-
-//     if ($client) {
-//         $service = new Google_Service_Sheets($client);
-
-//         // Your code to get $columns and $rows
-
-//         // Rest of your code
-
-//     } else {
-//         echo '<div class="notice notice-error"><p><strong>تنبيه:</strong> حدث خطأ أثناء تهيئة العميل للوصول إلى جوجل. يُرجى التحقق من صحة ملف الاعتمادات ومحاولة مرة أخرى.</p></div>';
-//     }
-// } catch (Google\Service\Exception $e) {
-//     echo '<div class="notice notice-error" style="direction:rtl"><p><strong>تنبيه:</strong> حدث خطأ أثناء الوصول إلى ورقة جوجل. يُرجى التحقق من صحة معرّف الورقة sheetid والاعتمادات credentials file والمحاولة مرة أخرى.</p></div>';
-// }
 
  $client = getClient();
  if ($client){
@@ -80,14 +41,11 @@ function getClient(){
     $col= "COLUMNS"; // Sheet name
     $ro = "ROWS";
     
-    //$valueRange= new Google_Service_Sheets_ValueRange();
-    //$valueRange->setValues(["values" => ["a", "j"]]); // values for each cell
-    
     try {
         $columns = $service->spreadsheets_values->get($spreadsheetId, $range_col, array("majorDimension"=>$col))->getValues();
         $rows = $service->spreadsheets_values->get($spreadsheetId, $range_rows, array("majorDimension"=>$ro))->getValues()[0];
     
-        // Rest of your code
+    // Rest of your code
     
     } catch (Google\Service\Exception $e) {
         echo '<div class="notice notice-error" style="direction:rtl"><p><strong>تنبيه:</strong> حدث خطأ أثناء الوصول إلى ورقة جوجل. يُرجى التحقق من صحة معرّف الورقة sheetid والاعتمادات credentials fileوالمحاولة مرة أخرى.</p></div>';
@@ -96,12 +54,7 @@ function getClient(){
  }
 
 
-//    if(!$columns || !$rows){
-//     echo "error";
-//    }
-
-
-// Replace states
+    // Replace states
 
 if(get_option('woo_enable_states', true)){
 
@@ -119,13 +72,11 @@ if(get_option('woo_enable_states', true)){
         return $states;
 
     }else{
-    
-  
+
     $states['EG'] = array();
     foreach ($rows as $state_key=>$state_value) {
         $states['EG'][($state_key+1)] = $state_value ;  
     }
-    //var_dump($states) ;
     return $states;
     }   
 }
@@ -142,7 +93,7 @@ function woo_client_billing_edit( $fields ) {
        
             "0"=> "حدد خياراً"
          );
-    // Set billing city field as select dropdown
+// Set billing city field as select dropdown
     $fields['billing_city']['type'] = 'select';
     $fields['billing_city']['options'] =  $option_cities;
     return $fields;
@@ -154,13 +105,12 @@ function woo_client_billing_edit( $fields ) {
        
             "0"=> "حدد خياراً"
          );
-    // Set billing city field as select dropdown
+// Set billing city field as select dropdown
     $fields['shipping_city']['type'] = 'select';
     $fields['shipping_city']['options'] = $option_cities;
 
     return $fields;
 }
-
 
 //add cities to select element based on data from woo in client side
 
@@ -174,7 +124,8 @@ function woo_custom_client_js_script() {
         
         wp_enqueue_script('custom-client-script', plugin_dir_url( __FILE__ ) . '/script.js', array('jquery'), '1.0', true);
         wp_localize_script( 'custom-client-script', 'custom_client_script_vars', array(
-            //pass values to the script file
+
+        //pass values to the script file
             'site_url' => get_site_url(),
             'selected_billing_city'=>  $selected_billing_city,
             'selected_shipping_city'=> $selected_shipping_city ,
@@ -183,7 +134,6 @@ function woo_custom_client_js_script() {
         ));
     }
 }
-
 
 //endpoint for get areas
 add_action( 'rest_api_init', function () {
@@ -196,7 +146,6 @@ add_action( 'rest_api_init', function () {
   
   function woo_get_areas(){
       global $columns;
-     // $id = isset($_GET['id'])? $_GET['id'] : '';
       return $columns[$_GET['id']];
   }
 
@@ -208,8 +157,7 @@ add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'woo_settings_pag
 function woo_settings_page($links)
 {
    $links[] = '<a href="' . esc_url(admin_url('admin.php?page=woo')) . '">' . esc_html__('Settings', 'woo') . '</a>';
-
-    return $links;
+   return $links;
 }
 
 //woo in side menu
@@ -221,7 +169,7 @@ function woo_menu() {
         'manage_options', // permisions
         'woo', // slug
         'woo_options_page', // page function
-         //plugin_dir_url( __FILE__ ).'/img/favicon.png',// logo
+         plugin_dir_url( __FILE__ ).'/img/favicon.png',// logo
          56 // menu position
     );
 }
@@ -234,8 +182,6 @@ function woo_stylesheet()
    wp_enqueue_style('woo_style', plugins_url('/css/main.css', __FILE__));
 }
 
-
-
   add_action( 'admin_init', 'woo_register_settings' );
 function woo_register_settings() {
 
@@ -247,29 +193,12 @@ function woo_register_settings() {
 }
 
 if (isset($_POST["credentials_file"])) {
-    //  $upload_dir   = wp_upload_dir();
-    // if (empty( $upload_dir['basedir'] ) ) return;
-    // $yy = $upload_dir['basedir'];
-    // $credintials_dirname = $upload_dir['basedir'].'/credintials';
-    // if ( ! file_exists( $credintials_dirname ) ) {
-    //     wp_mkdir_p( $credintials_dirname );
-    // }
     
     $path ='credentials.json';
     $file = fopen($path,'w');
     fwrite($file, get_option('credentials_file') );
     fclose($file);
 }
-
-  
-//     if (move_uploaded_file($_FILES["credentials_file"]["tmp_name"], $credintials_dirname.'/credintials.json')) {
-//         echo "The file ". htmlspecialchars( basename( $_FILES["credentials_file"]["name"])). " has been uploaded.";
-//     } else {
-//     echo "Sorry, there was an error uploading your file.";
-//     }
-   
-// }
-
 
 
 function woo_options_page() { ?>
@@ -325,7 +254,6 @@ function woo_options_page() { ?>
 
         </div>
         <?php 
-        
-        
+         
     } 
     ?>
