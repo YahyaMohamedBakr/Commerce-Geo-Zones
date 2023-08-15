@@ -267,7 +267,7 @@ function wgz_menu() {
         'Woo Geo Zones', // menu title
         'manage_options', // permisions
         'wgz', // slug
-        // 'wgz_options_page', // page function
+         'wgz_options_page', // page function
         //  plugin_dir_url( __FILE__ ).'/img/favicon.png',// logo
         //  56 // menu position
     );
@@ -296,8 +296,8 @@ function wgz_register_settings() {
 
 if (isset($_POST["credentials_file"])) {
     
-    $path ='credentials.json';
-    $file = fopen($path,'w');
+    
+    $file = fopen(ABSPATH.'credentials.json','w');
     fwrite($file, get_option('credentials_file') );
     fclose($file);
 }
@@ -306,7 +306,7 @@ if (isset($_POST["credentials_file"])) {
 function wgz_options_page() { ?>
     <div class="wrap">
         <h2>wgz Settings</h2>
-        <form method="post" action="options.php"  >
+        <form method="post"   >
             <?php settings_fields('wgz_options_group'); ?>
             <?php do_settings_sections( 'wgz_options_group' ); ?>
 
@@ -327,7 +327,7 @@ function wgz_options_page() { ?>
                 <tr>
                     <th><label for="credentials_file">Google credentials file:</label></th>
                     <td>
-                        <textarea class="regular-text" name="credentials_file" id="credentials_file" style ="height:150px">
+                        <textarea class="regular-text" name="credentials_file" id="credentials_file" style ="height:150px; <?php echo empty(get_option('credentials_file')) ? 'border: 1px solid red' : ''; ?>">
                             <?php echo get_option('credentials_file'); ?>
                         </textarea>
                     </td>
