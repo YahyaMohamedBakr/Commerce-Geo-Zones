@@ -314,7 +314,7 @@ if (isset($_POST["credentials_file"])) {
 function wgz_options_page() { ?>
     <div class="wrap">
         <h2>WooGeoZones Settings</h2>
-        <form method="post"   >
+        <form method="post"  action="options.php" >
             <?php settings_fields('wgz_options_group'); ?>
             <?php do_settings_sections( 'wgz_options_group' ); ?>
 
