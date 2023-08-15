@@ -11,7 +11,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 WooGeoZones is a powerful WooCommerce plugin that enhances your e-commerce experience by intelligently replacing traditional countries and cities with accurate geographical zones. This plugin leverages the capabilities of artificial intelligence to seamlessly integrate with Google Sheets, allowing you to effortlessly manage and update geo zones. Say goodbye to manual data entry and hello to a more efficient and streamlined process.
 
 = Key Features =
-- AI-Powered Geo Zones: WooGeoZones uses advanced artificial intelligence to automatically replace countries and cities with accurate geographic zones.
+-  Geo Zones Powered: WooGeoZones automatically replace countries and cities with accurate geographic zones.
 - Google Sheets Integration: Manage your geo zone data effortlessly using Google Sheets, ensuring real-time updates and easy collaboration.
 - Seamless WooCommerce Integration: WooGeoZones seamlessly integrates with WooCommerce, providing a smooth shopping experience for your customers.
 - Dynamic City Selection: The plugin dynamically populates city options based on the selected state, enhancing user experience during checkout.
@@ -31,8 +31,6 @@ WooGeoZones is a powerful WooCommerce plugin that enhances your e-commerce exper
 3. Upload your Google credentials file.
 4. Save your settings.
 
-= How can I dynamically populate city options based on the selected state? =
-WooGeoZones automatically populates the city options dropdown based on the state selected during checkout. This feature enhances the user experience and simplifies the checkout process.
 
 == Changelog ==
 = 1.0.0 =
