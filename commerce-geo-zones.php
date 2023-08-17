@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: Woo Geo Zones
- * Description: WooCommerce Plugin to replace countries and cities with drive google cheets
+ * Plugin Name: Commerce geographic Zones
+ * Description:  Plugin to replace WooCommerce countries and cities with drive google cheets
  * Author: Yahya Bakr
  * Author URI: https://Motaweroon.com/
  * Version: 1.0.0
@@ -13,7 +13,7 @@
  */
 
 
-require (ABSPATH.'/wp-content/plugins/WooGeoZones/vendor/autoload.php');
+require (ABSPATH.'/wp-content/plugins/Commerce-Geo-Zones/vendor/autoload.php');
 
 
 // credentials file create
@@ -65,12 +65,12 @@ function getClient(){
 
     // Replace states
 
-if(get_option('wgz_enable_states', true)){
+if(get_option('cgz_enable_states', true)){
 
-    add_filter( 'woocommerce_states', 'wgz_custom_woocommerce_states' );
+    add_filter( 'woocommerce_states', 'cgz_custom_woocommerce_states' );
 }
 
- function wgz_custom_woocommerce_states( $states ) {
+ function cgz_custom_woocommerce_states( $states ) {
 
     
     global $rows;
@@ -92,12 +92,12 @@ if(get_option('wgz_enable_states', true)){
 
 
 //change city field to select element in client side
-if(get_option('wgz_enable_cities', true)){
-add_filter( 'woocommerce_billing_fields' , 'wgz_client_billing_edit');
-add_filter( 'woocommerce_shipping_fields' , 'wgz_client_shipping_edit');
-add_action( 'wp_enqueue_scripts', 'wgz_custom_client_js_script' );
+if(get_option('cgz_enable_cities', true)){
+add_filter( 'woocommerce_billing_fields' , 'cgz_client_billing_edit');
+add_filter( 'woocommerce_shipping_fields' , 'cgz_client_shipping_edit');
+add_action( 'wp_enqueue_scripts', 'cgz_custom_client_js_script' );
 }
-function wgz_client_billing_edit( $fields ) {
+function cgz_client_billing_edit( $fields ) {
     $option_cities = array(
        
             "0"=> "حدد خياراً"
@@ -109,7 +109,7 @@ function wgz_client_billing_edit( $fields ) {
 }
 
 
- function wgz_client_shipping_edit( $fields ) {
+ function cgz_client_shipping_edit( $fields ) {
     $option_cities = array(
        
             "0"=> "حدد خياراً"
@@ -121,9 +121,9 @@ function wgz_client_billing_edit( $fields ) {
     return $fields;
 }
 
-//add cities to select element based on data from wgz in client side
+//add cities to select element based on data from cgz in client side
 
-function wgz_custom_client_js_script() {
+function cgz_custom_client_js_script() {
 
     $current_url = $_SERVER['REQUEST_URI'];
     if (( is_checkout() && ! is_wc_endpoint_url() )||strpos($current_url, '/billing') !== false || strpos($current_url, '/shipping') !== false) {
@@ -148,13 +148,13 @@ function wgz_custom_client_js_script() {
 
 //admin side 
 
-if(get_option('wgz_enable_admin', true)){
-    add_filter( 'woocommerce_admin_billing_fields' , 'wgz_admin_billing_edit' );
-    add_filter( 'woocommerce_admin_shipping_fields' , 'wgz_admin_shipping_edit' );
-    add_action( 'admin_enqueue_scripts', 'wgz_admin_side_script' );
+if(get_option('cgz_enable_admin', true)){
+    add_filter( 'woocommerce_admin_billing_fields' , 'cgz_admin_billing_edit' );
+    add_filter( 'woocommerce_admin_shipping_fields' , 'cgz_admin_shipping_edit' );
+    add_action( 'admin_enqueue_scripts', 'cgz_admin_side_script' );
 }
 
- function wgz_admin_billing_edit( $fields ) {
+ function cgz_admin_billing_edit( $fields ) {
     $order = wc_get_order();
     $selected_billing =$order->get_billing_city();
     $selected_billing_city =explode(':',$selected_billing) ;
@@ -181,7 +181,7 @@ if(get_option('wgz_enable_admin', true)){
      return $fields;
  }
 
- function wgz_admin_shipping_edit( $fields ) {
+ function cgz_admin_shipping_edit( $fields ) {
     $order = wc_get_order();
     $selected_shipping = $order->get_shipping_city();
     $selected_shipping_city =explode(':',$selected_shipping) ;
@@ -210,8 +210,8 @@ if(get_option('wgz_enable_admin', true)){
     return $fields;
 }
 
-// add cities to select element based on data from wgz in admin side 
-function wgz_admin_side_script() {
+// add cities to select element based on data from cgz in admin side 
+function cgz_admin_side_script() {
    
     $order = wc_get_order();
     
@@ -228,8 +228,8 @@ function wgz_admin_side_script() {
     $selected_billing_state_value =$order->get_billing_state();
     $selected_shipping_state_value = $order->get_shipping_state();
 
-    wp_enqueue_script( 'wgz-admin-side-script', plugin_dir_url( __FILE__ ) . '/js/admin.js', array( 'jquery' ), '1.0', true );
-    wp_localize_script( 'wgz-admin-side-script', 'wgz_admin_side_script_vars', array(
+    wp_enqueue_script( 'cgz-admin-side-script', plugin_dir_url( __FILE__ ) . '/js/admin.js', array( 'jquery' ), '1.0', true );
+    wp_localize_script( 'cgz-admin-side-script', 'cgz_admin_side_script_vars', array(
         //pass values to the script file
         'site_url' => get_site_url(),
         'selected_billing_city_name'=>$selected_billing_city_name,
@@ -245,14 +245,14 @@ function wgz_admin_side_script() {
 
 //endpoint for get areas
 add_action( 'rest_api_init', function () {
-    register_rest_route( 'wgz','/getareas', array(
+    register_rest_route( 'cgz','/getareas', array(
       'methods' => 'GET',
-      'callback' => 'wgz_get_areas',
+      'callback' => 'cgz_get_areas',
       'permission_callback' => '__return_true'
     ));
   });
   
-  function wgz_get_areas(){
+  function cgz_get_areas(){
       global $columns;
       return $columns[$_GET['id']];
   }
@@ -260,45 +260,45 @@ add_action( 'rest_api_init', function () {
 
 
 //Plugin Settings page
-add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'wgz_settings_page');
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'cgz_settings_page');
 
-function wgz_settings_page($links)
+function cgz_settings_page($links)
 {
-   $links[] = '<a href="' . esc_url(admin_url('admin.php?page=wgz')) . '">' . esc_html__('Settings', 'wgz') . '</a>';
+   $links[] = '<a href="' . esc_url(admin_url('admin.php?page=cgz')) . '">' . esc_html__('Settings', 'cgz') . '</a>';
    return $links;
 }
 
-//wgz in side menu
-add_action( 'admin_menu', 'wgz_menu' );
-function wgz_menu() {
+//cgz in side menu
+add_action( 'admin_menu', 'cgz_menu' );
+function cgz_menu() {
     add_menu_page(
-        'Woo Geo Zones', // page title
-        'Woo Geo Zones', // menu title
+        'Commerce Geo Zones', // page title
+        'Commerce Geo Zones', // menu title
         'manage_options', // permisions
-        'WooGeoZones', // slug
-         'wgz_options_page', // page function
+        'Commerce-Geo-Zones', // slug
+         'cgz_options_page', // page function
         //  plugin_dir_url( __FILE__ ).'/img/favicon.png',// logo
         //  56 // menu position
     );
 }
 
 //main style sheet
-add_action('admin_print_styles', 'wgz_stylesheet');
+add_action('admin_print_styles', 'cgz_stylesheet');
 
-function wgz_stylesheet()
+function cgz_stylesheet()
 {
-   wp_enqueue_style('wgz_style', plugins_url('/css/main.css', __FILE__));
+   wp_enqueue_style('cgz_style', plugins_url('/css/main.css', __FILE__));
 }
 
-  add_action( 'admin_init', 'wgz_register_settings' );
-function wgz_register_settings() {
+  add_action( 'admin_init', 'cgz_register_settings' );
+function cgz_register_settings() {
 
-    register_setting('wgz_options_group', 'app_name');
-    register_setting('wgz_options_group', 'sheet_id');
-    register_setting('wgz_options_group', 'credentials_file');
-    register_setting('wgz_options_group', 'wgz_enable_states');
-    register_setting('wgz_options_group', 'wgz_enable_cities');
-    register_setting('wgz_options_group', 'wgz_enable_admin');
+    register_setting('cgz_options_group', 'app_name');
+    register_setting('cgz_options_group', 'sheet_id');
+    register_setting('cgz_options_group', 'credentials_file');
+    register_setting('cgz_options_group', 'cgz_enable_states');
+    register_setting('cgz_options_group', 'cgz_enable_cities');
+    register_setting('cgz_options_group', 'cgz_enable_admin');
 
     
 }
@@ -312,12 +312,12 @@ if (isset($_POST["credentials_file"])) {
 }
 
 
-function wgz_options_page() { ?>
+function cgz_options_page() { ?>
     <div class="wrap">
-        <h2>WooGeoZones Settings</h2>
+        <h2>Commerce Geo Zones Settings</h2>
         <form method="post"  action="options.php" >
-            <?php settings_fields('wgz_options_group'); ?>
-            <?php do_settings_sections( 'wgz_options_group' ); ?>
+            <?php settings_fields('cgz_options_group'); ?>
+            <?php do_settings_sections( 'cgz_options_group' ); ?>
 
             <table class="form-table">
                 <tr>
@@ -342,29 +342,29 @@ function wgz_options_page() { ?>
                     </td>
                 </tr>
                 <tr>
-                    <th><label for="wgz_enable_states">Enable states ?</label></th>
+                    <th><label for="cgz_enable_states">Enable states ?</label></th>
                     <td>
-                    <select class="regular-text" name="wgz_enable_states" id="wgz_enable_states">
-                        <option value ="1" <?php selected( get_option( 'wgz_enable_states' ), 1 ); ?>>Yes</option>
-                        <option value ="0" <?php selected( get_option( 'wgz_enable_states' ), 0 ); ?>>No</option>
+                    <select class="regular-text" name="cgz_enable_states" id="cgz_enable_states">
+                        <option value ="1" <?php selected( get_option( 'cgz_enable_states' ), 1 ); ?>>Yes</option>
+                        <option value ="0" <?php selected( get_option( 'cgz_enable_states' ), 0 ); ?>>No</option>
                     </select>
                     </td>
                 </tr>
                 <tr>
-                    <th><label for="wgz_enable_states">Enable cities ?</label></th>
+                    <th><label for="cgz_enable_states">Enable cities ?</label></th>
                     <td>
-                    <select class="regular-text" name="wgz_enable_cities" id="wgz_enable_cities">
-                        <option value ="1" <?php selected( get_option( 'wgz_enable_cities' ), 1 ); ?>>Yes</option>
-                        <option value ="0" <?php selected( get_option( 'wgz_enable_cities' ), 0 ); ?>>No</option>
+                    <select class="regular-text" name="cgz_enable_cities" id="cgz_enable_cities">
+                        <option value ="1" <?php selected( get_option( 'cgz_enable_cities' ), 1 ); ?>>Yes</option>
+                        <option value ="0" <?php selected( get_option( 'cgz_enable_cities' ), 0 ); ?>>No</option>
                     </select>
                     </td>
                 </tr>
                 <tr>
-                    <th><label for="wgz_enable_states">Enable cities in Admin side ?</label></th>
+                    <th><label for="cgz_enable_states">Enable cities in Admin side ?</label></th>
                     <td>
-                    <select class="regular-text" name="wgz_enable_admin" id="wgz_enable_admin">
-                        <option value ="1" <?php selected( get_option( 'wgz_enable_admin' ), 1 ); ?>>Yes</option>
-                        <option value ="0" <?php selected( get_option( 'wgz_enable_admin' ), 0 ); ?>>No</option>
+                    <select class="regular-text" name="cgz_enable_admin" id="cgz_enable_admin">
+                        <option value ="1" <?php selected( get_option( 'cgz_enable_admin' ), 1 ); ?>>Yes</option>
+                        <option value ="0" <?php selected( get_option( 'cgz_enable_admin' ), 0 ); ?>>No</option>
                     </select>
                     </td>
                 </tr>

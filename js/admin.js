@@ -1,12 +1,12 @@
 //admin-side.js
-var siteUrl = wgz_admin_side_script_vars.site_url;
-var selectBillingCityName = wgz_admin_side_script_vars.selected_billing_city_name;
-var selectBillingCityValue = wgz_admin_side_script_vars.selected_billing_city_value;
-var selectShippingCityName = wgz_admin_side_script_vars.selected_shipping_city_name;
-var selectShippingCityValue = wgz_admin_side_script_vars.selected_shipping_city_value;
+var siteUrl = cgz_admin_side_script_vars.site_url;
+var selectBillingCityName = cgz_admin_side_script_vars.selected_billing_city_name;
+var selectBillingCityValue = cgz_admin_side_script_vars.selected_billing_city_value;
+var selectShippingCityName = cgz_admin_side_script_vars.selected_shipping_city_name;
+var selectShippingCityValue = cgz_admin_side_script_vars.selected_shipping_city_value;
 
-var selectBillingStateValue = wgz_admin_side_script_vars.selected_billing_state_value;
-var selectShippingStateValue = wgz_admin_side_script_vars.selected_shipping_state_value;
+var selectBillingStateValue = cgz_admin_side_script_vars.selected_billing_state_value;
+var selectShippingStateValue = cgz_admin_side_script_vars.selected_shipping_state_value;
 
 function fillCities(select, options) {
     for(var option in options ) {
@@ -35,7 +35,7 @@ function getAreas(dropdownElement, stateId, defaultValue) {
     // waiting message until the data arrives 
     dropdownElement.appendChild(new Option('انتظر لحظات ....', '0'));
 
-    fetch(siteUrl+"/wp-json/wgz/getareas?id="+(stateId-1))
+    fetch(siteUrl+"/wp-json/cgz/getareas?id="+(stateId-1))
     .then((response) => response.json())
     .then((data) => {
 
@@ -74,7 +74,7 @@ function getSelectedArea(dropdownElement, stateId, cityName, cityValue) {
 
        return;
     }else{
-    fetch(siteUrl+"/wp-json/wgz/getareas?id="+(stateId-1))
+    fetch(siteUrl+"/wp-json/cgz/getareas?id="+(stateId-1))
     .then((response) => response.json())
     .then((data) => {
         dropdownElement.replaceChildren();
