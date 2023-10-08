@@ -14,7 +14,7 @@
 
 
 require (ABSPATH.'/wp-content/plugins/Commerce-Geo-Zones/vendor/autoload.php');
-
+include_once('classes.php');
 
 // credentials file create
     $upload_dir   = wp_upload_dir();
@@ -91,156 +91,31 @@ if(get_option('cgz_enable_states', true)){
 }
 
 
+
+$clientBilling= new client('billing_city');
+$clientShipping= new client('shipping_city');
+
+
 //change city field to select element in client side
 if(get_option('cgz_enable_cities', true)){
-add_filter( 'woocommerce_billing_fields' , 'cgz_client_billing_edit');
-add_filter( 'woocommerce_shipping_fields' , 'cgz_client_shipping_edit');
-add_action( 'wp_enqueue_scripts', 'cgz_custom_client_js_script' );
-}
-function cgz_client_billing_edit( $fields ) {
-    $option_cities = array(
-       
-            "0"=> "حدد خياراً"
-         );
-// Set billing city field as select dropdown
-    $fields['billing_city']['type'] = 'select';
-    $fields['billing_city']['options'] =  $option_cities;
-    return $fields;
-}
-
-
- function cgz_client_shipping_edit( $fields ) {
-    $option_cities = array(
-       
-            "0"=> "حدد خياراً"
-         );
-// Set billing city field as select dropdown
-    $fields['shipping_city']['type'] = 'select';
-    $fields['shipping_city']['options'] = $option_cities;
-
-    return $fields;
-}
-
-//add cities to select element based on data from cgz in client side
-
-function cgz_custom_client_js_script() {
-
-    $current_url = $_SERVER['REQUEST_URI'];
-    if (( is_checkout() && ! is_wc_endpoint_url() )||strpos($current_url, '/billing') !== false || strpos($current_url, '/shipping') !== false) {
-        $woo=WC(); //woocommerce object
-        $selected_billing_city= $woo->customer->get_billing_city();
-        $selected_shipping_city = $woo->customer->get_shipping_city();
-        
-        wp_enqueue_script('custom-client-script', plugin_dir_url( __FILE__ ) . '/js/client.js', array('jquery'), '1.0', true);
-        wp_localize_script( 'custom-client-script', 'custom_client_script_vars', array(
-
-        //pass values to the script file
-            'site_url' => get_site_url(),
-            'selected_billing_city'=>  $selected_billing_city,
-            'selected_shipping_city'=> $selected_shipping_city ,
-            
-
-        ));
-    }
+add_filter( 'woocommerce_billing_fields' , array($clientBilling,'cityDropdown'));
+add_filter( 'woocommerce_shipping_fields' , array ($clientShipping, 'cityDropdown'));
+add_action( 'wp_enqueue_scripts', array ($clientShipping, 'addScript') );
 }
 
 
 
+
+$adminBilling = new admin('billing_city');
+$adminShipping = new admin ('shipping_city');
 //admin side 
 
 if(get_option('cgz_enable_admin', true)){
-    add_filter( 'woocommerce_admin_billing_fields' , 'cgz_admin_billing_edit' );
-    add_filter( 'woocommerce_admin_shipping_fields' , 'cgz_admin_shipping_edit' );
-    add_action( 'admin_enqueue_scripts', 'cgz_admin_side_script' );
+    add_filter( 'woocommerce_admin_billing_fields' , array($adminBilling,'cityDropdown') );
+    add_filter( 'woocommerce_admin_shipping_fields' , array($adminShipping,'cityDropdown') );
+    add_action( 'admin_enqueue_scripts', array($adminBilling, 'addScript') );
 }
 
- function cgz_admin_billing_edit( $fields ) {
-    $order = wc_get_order();
-    $selected_billing =$order->get_billing_city();
-    $selected_billing_city =explode(':',$selected_billing) ;
-    $selected_billing_city_name =$selected_billing_city[1];
-    $selected_billing_city_value = $selected_billing_city[0];
-    
-    if( !$selected_billing_city_name || !$selected_billing_city_value){
-        $option_cities = array(
-        
-            '0' => 'اختر مدينة'
-        );
-    }else{
-        $option_cities = array(
-            $selected_billing_city_value.':'.$selected_billing_city_name => $selected_billing_city_name,
-            '0'=>'جارٍ تحميل بقية المدن'
-        );
-    }
-
-    
-     // Set billing city field as select dropdown
-     $fields['city']['type'] = 'select';
-     $fields['city']['options'] = $option_cities;
- 
-     return $fields;
- }
-
- function cgz_admin_shipping_edit( $fields ) {
-    $order = wc_get_order();
-    $selected_shipping = $order->get_shipping_city();
-    $selected_shipping_city =explode(':',$selected_shipping) ;
-    $selected_shipping_city_name =$selected_shipping_city[1];
-    $selected_shipping_city_value = $selected_shipping_city[0];
-    
-
-    if( !$selected_shipping_city_name || ! $selected_shipping_city_value){
-        $option_cities = array(
-        
-            '0' => 'اختر مدينة'
-        );
-    }else{
-
-        $option_cities = array(
-            
-            $selected_shipping_city_value.':'.$selected_shipping_city_name => $selected_shipping_city_name,
-            '0'=>'جارٍ تحميل بقية المدن'
-        );
-    }
-    
-    // Set billing city field as select dropdown
-    $fields['city']['type'] = 'select';
-    $fields['city']['options'] = $option_cities;
-
-    return $fields;
-}
-
-// add cities to select element based on data from cgz in admin side 
-function cgz_admin_side_script() {
-   
-    $order = wc_get_order();
-    
-    
-    if($order){
-    //cities values
-    $selected_billing_city_arr =explode(':',$order->get_billing_city());
-    $selected_billing_city_name =$selected_billing_city_arr[1];
-    $selected_billing_city_value = $selected_billing_city_arr[0];
-    $selected_shipping_city_arr =explode(':',$order->get_shipping_city()) ;
-    $selected_shipping_city_name =$selected_shipping_city_arr[1];
-    $selected_shipping_city_value = $selected_shipping_city_arr[0];
-    //states values
-    $selected_billing_state_value =$order->get_billing_state();
-    $selected_shipping_state_value = $order->get_shipping_state();
-
-    wp_enqueue_script( 'cgz-admin-side-script', plugin_dir_url( __FILE__ ) . '/js/admin.js', array( 'jquery' ), '1.0', true );
-    wp_localize_script( 'cgz-admin-side-script', 'cgz_admin_side_script_vars', array(
-        //pass values to the script file
-        'site_url' => get_site_url(),
-        'selected_billing_city_name'=>$selected_billing_city_name,
-        'selected_billing_city_value'=>$selected_billing_city_value,
-        'selected_shipping_city_name'=> $selected_shipping_city_name,
-        'selected_shipping_city_value'=> $selected_shipping_city_value,
-        'selected_billing_state_value'=> $selected_billing_state_value,
-        'selected_shipping_state_value'=> $selected_shipping_state_value,
-    ));
-}
-}
 
 
 //endpoint for get areas

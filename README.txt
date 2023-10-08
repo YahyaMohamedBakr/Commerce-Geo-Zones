@@ -1,5 +1,5 @@
 === WooGeoZones ===
-Contributors: [Yahya Bakr]
+Contributors: [Your Name]
 Tags: woocommerce, geo zones, cities, states, artificial intelligence
 Requires at least: 5.0
 Tested up to: 6.2
