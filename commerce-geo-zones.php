@@ -21,12 +21,12 @@ require (ABSPATH.'/wp-content/plugins/Commerce-Geo-Zones/geo-zone-options.php');
 include_once('classes.php');
 
 // credentials file create
-    $upload_dir   = wp_upload_dir();
-    if (empty($upload_dir['basedir'])) return;
-    $credentials_dirname = $upload_dir['basedir'].'/credentials';
-    if (!file_exists($credentials_dirname)) {
-        wp_mkdir_p($credentials_dirname);
-    }
+    // $upload_dir   = wp_upload_dir();
+    // if (empty($upload_dir['basedir'])) return;
+    // $credentials_dirname = $upload_dir['basedir'].'/credentials';
+    // if (!file_exists($credentials_dirname)) {
+    //     wp_mkdir_p($credentials_dirname);
+    // }
 
 function cgz_getClient(){
     $app_name = isset($_POST['app_name']) ? sanitize_text_field($_POST['app_name']) : '';
@@ -36,7 +36,7 @@ function cgz_getClient(){
         $client->setApplicationName($app_name);
         $client->setScopes(Google_Service_Sheets::SPREADSHEETS);
         //PATH TO JSON FILE DOWNLOADED FROM GOOGLE CONSOLE FROM STEP 7
-        $client->setAuthConfig(ABSPATH . 'wp-content/uploads/credentials/credentials.json'); 
+        $client->setAuthConfig(get_option('credentials_file')); 
         //$client->setAccessType('offline');
         return $client;
     }
