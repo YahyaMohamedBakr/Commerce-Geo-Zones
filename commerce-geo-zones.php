@@ -12,8 +12,12 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
 
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 require (ABSPATH.'/wp-content/plugins/Commerce-Geo-Zones/vendor/autoload.php');
+require (ABSPATH.'/wp-content/plugins/Commerce-Geo-Zones/geo-zone-options.php');
 include_once('classes.php');
 
 // credentials file create
@@ -24,14 +28,16 @@ include_once('classes.php');
         wp_mkdir_p($credentials_dirname);
     }
 
-function getClient(){
+function cgz_getClient(){
+    $app_name = isset($_POST['app_name']) ? sanitize_text_field($_POST['app_name']) : '';
+
     try{
         $client = new Google_Client();
-        $client->setApplicationName(get_option('app_name'));
+        $client->setApplicationName($app_name);
         $client->setScopes(Google_Service_Sheets::SPREADSHEETS);
         //PATH TO JSON FILE DOWNLOADED FROM GOOGLE CONSOLE FROM STEP 7
         $client->setAuthConfig(ABSPATH . 'wp-content/uploads/credentials/credentials.json'); 
-        $client->setAccessType('offline');
+        //$client->setAccessType('offline');
         return $client;
     }
     catch(Exception $e){
@@ -40,7 +46,7 @@ function getClient(){
    
 }
 
- $client = getClient();
+ $client = cgz_getClient();
  if ($client){
 
     $service = new Google_Service_Sheets($client);
@@ -75,16 +81,16 @@ if(get_option('cgz_enable_states', true)){
     
     global $rows;
     if ( !( $rows )) {
-        $states['IQ'] = array(
+        $states['EG'] = array(
             '0' => 'يتعذر تحميل المحافظات يرجى المحاولة لاحقا'
         );
         return $states;
 
     }else{
 
-    $states['IQ'] = array();
+    $states['EG'] = array();
     foreach ($rows as $state_key=>$state_value) {
-        $states['IQ'][($state_key+1)] = $state_value ;  
+        $states['EG'][($state_key+1)] = $state_value ;  
     }
     return $states;
     }   
@@ -134,122 +140,3 @@ add_action( 'rest_api_init', function () {
 
 
 
-//Plugin Settings page
-add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'cgz_settings_page');
-
-function cgz_settings_page($links)
-{
-   $links[] = '<a href="' . esc_url(admin_url('admin.php?page=cgz')) . '">' . esc_html__('Settings', 'cgz') . '</a>';
-   return $links;
-}
-
-//cgz in side menu
-add_action( 'admin_menu', 'cgz_menu' );
-function cgz_menu() {
-    add_menu_page(
-        'Commerce Geo Zones', // page title
-        'Commerce Geo Zones', // menu title
-        'manage_options', // permisions
-        'Commerce-Geo-Zones', // slug
-         'cgz_options_page', // page function
-        //  plugin_dir_url( __FILE__ ).'/img/favicon.png',// logo
-        //  56 // menu position
-    );
-}
-
-//main style sheet
-add_action('admin_print_styles', 'cgz_stylesheet');
-
-function cgz_stylesheet()
-{
-   wp_enqueue_style('cgz_style', plugins_url('/css/main.css', __FILE__));
-}
-
-  add_action( 'admin_init', 'cgz_register_settings' );
-function cgz_register_settings() {
-
-    register_setting('cgz_options_group', 'app_name');
-    register_setting('cgz_options_group', 'sheet_id');
-    register_setting('cgz_options_group', 'credentials_file');
-    register_setting('cgz_options_group', 'cgz_enable_states');
-    register_setting('cgz_options_group', 'cgz_enable_cities');
-    register_setting('cgz_options_group', 'cgz_enable_admin');
-
-    
-}
-
-if (isset($_POST["credentials_file"])) {
-    
-    
-    $file = fopen(ABSPATH.'wp-content/uploads/credentials/credentials.json','w');
-    fwrite($file, get_option('credentials_file') );
-    fclose($file);
-}
-
-
-function cgz_options_page() { ?>
-    <div class="wrap">
-        <h2>Commerce Geo Zones Settings</h2>
-        <form method="post"  action="options.php" >
-            <?php settings_fields('cgz_options_group'); ?>
-            <?php do_settings_sections( 'cgz_options_group' ); ?>
-
-            <table class="form-table">
-                <tr>
-                    <th><label for="app_name">Google Application Name:</label></th>
-                    <td>
-                        <input  type = 'text' class="regular-text" id="app_name" name="app_name" value="<?php echo get_option('app_name'); ?>" style="<?php echo empty(get_option('app_name')) ? 'border: 1px solid red' : ''; ?>">
-                    </td>
-                </tr>
-                <tr>
-                    <th><label for="sheet_id">Google Sheet Id:</label></th>
-                    <td>
-                        <input  type = 'text' class="regular-text" id="sheet_id" name="sheet_id" value="<?php echo get_option('sheet_id'); ?>" style="<?php echo empty(get_option('sheet_id')) ? 'border: 1px solid red' : ''; ?>">
-                    </td>
-                </tr>
-                
-                <tr>
-                    <th><label for="credentials_file">Google credentials file:</label></th>
-                    <td>
-                        <textarea class="regular-text" name="credentials_file" id="credentials_file" style ="height:150px; <?php echo empty(get_option('credentials_file')) ? 'border: 1px solid red' : ''; ?>">
-                            <?php echo get_option('credentials_file'); ?>
-                        </textarea>
-                    </td>
-                </tr>
-                <tr>
-                    <th><label for="cgz_enable_states">Enable states ?</label></th>
-                    <td>
-                    <select class="regular-text" name="cgz_enable_states" id="cgz_enable_states">
-                        <option value ="1" <?php selected( get_option( 'cgz_enable_states' ), 1 ); ?>>Yes</option>
-                        <option value ="0" <?php selected( get_option( 'cgz_enable_states' ), 0 ); ?>>No</option>
-                    </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><label for="cgz_enable_states">Enable cities ?</label></th>
-                    <td>
-                    <select class="regular-text" name="cgz_enable_cities" id="cgz_enable_cities">
-                        <option value ="1" <?php selected( get_option( 'cgz_enable_cities' ), 1 ); ?>>Yes</option>
-                        <option value ="0" <?php selected( get_option( 'cgz_enable_cities' ), 0 ); ?>>No</option>
-                    </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><label for="cgz_enable_states">Enable cities in Admin side ?</label></th>
-                    <td>
-                    <select class="regular-text" name="cgz_enable_admin" id="cgz_enable_admin">
-                        <option value ="1" <?php selected( get_option( 'cgz_enable_admin' ), 1 ); ?>>Yes</option>
-                        <option value ="0" <?php selected( get_option( 'cgz_enable_admin' ), 0 ); ?>>No</option>
-                    </select>
-                    </td>
-                </tr>
-            </table>
-
-            <?php submit_button(); ?>
-
-        </div>
-       
-        <?php 
-    }
-    
-    ?>
