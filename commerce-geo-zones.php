@@ -75,16 +75,16 @@ if(get_option('cgz_enable_states', true)){
     
     global $rows;
     if ( !( $rows )) {
-        $states['EG'] = array(
+        $states['IQ'] = array(
             '0' => 'يتعذر تحميل المحافظات يرجى المحاولة لاحقا'
         );
         return $states;
 
     }else{
 
-    $states['EG'] = array();
+    $states['IQ'] = array();
     foreach ($rows as $state_key=>$state_value) {
-        $states['EG'][($state_key+1)] = $state_value ;  
+        $states['IQ'][($state_key+1)] = $state_value ;  
     }
     return $states;
     }   
