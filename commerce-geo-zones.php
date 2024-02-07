@@ -137,7 +137,11 @@ add_action( 'rest_api_init', function () {
   
   function cgz_get_areas(){
       global $columns;
-      return $columns[$_GET['id']];
+
+      if(!empty($columns)){
+        return $columns[$_GET['id']];
+      }
+      
   }
 
 
