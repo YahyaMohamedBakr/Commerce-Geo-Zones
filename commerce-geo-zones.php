@@ -73,7 +73,7 @@ function cgz_getClient(){
     } catch (Google\Service\Exception $e) {
         echo '<div class="notice notice-error" style="direction:rtl"><p><strong>تنبيه:</strong> حدث خطأ أثناء الوصول إلى ورقة جوجل. يُرجى التحقق من صحة معرّف الورقة sheetid والاعتمادات credentials fileوالمحاولة مرة أخرى.</p></div>';
     }
-
+return;
  }
 
 
@@ -147,8 +147,8 @@ add_action( 'rest_api_init', function () {
       global $columns;
 
       
-        if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'get_areas_nonce')) {
-    return  $columns[$_GET['id']] ;
+        if (isset($_GET['id'])  && wp_verify_nonce($_POST['cgz_options_nonce'], 'save_cgz_options')) {
+            return  $columns[$_GET['id']] ;
             } else {
                 return null;
             }
