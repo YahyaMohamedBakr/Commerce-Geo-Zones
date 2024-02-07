@@ -29,7 +29,13 @@ include_once('classes.php');
     // }
 
 function cgz_getClient(){
-    $app_name = isset($_POST['app_name']) ? sanitize_text_field($_POST['app_name']) : '';
+
+    if (isset($_POST['cgz_options_nonce']) && wp_verify_nonce($_POST['cgz_options_nonce'], 'save_cgz_options')) {
+        // Process form data
+        $app_name = isset($_POST['app_name']) ? sanitize_text_field($_POST['app_name']) : '';
+        
+    }
+    
 
     try{
         $client = new Google_Client();
@@ -49,7 +55,7 @@ function cgz_getClient(){
 }
 
  $client = cgz_getClient();
- if ($client){
+ if (!empty($client)){
 
     $service = new Google_Service_Sheets($client);
     $spreadsheetId = get_option('sheet_id'); // spreadsheet Id
@@ -73,7 +79,7 @@ function cgz_getClient(){
 
     // Replace states
 
-if(get_option('cgz_enable_states', true)){
+if(get_option('cgz_enable_states', true) && !empty($client)){
 
     add_filter( 'woocommerce_states', 'cgz_custom_woocommerce_states' );
 }
@@ -135,12 +141,19 @@ add_action( 'rest_api_init', function () {
     ));
   });
   
+  //$nonce_url = wp_nonce_url(admin_url('admin-ajax.php?action=my_action&id=123'), 'get_areas_nonce');
+
   function cgz_get_areas(){
       global $columns;
 
-      if(!empty($columns)){
-        return $columns[$_GET['id']];
-      }
+      
+        if (isset($_GET['id']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'get_areas_nonce')) {
+    return  $columns[$_GET['id']] ;
+            } else {
+                return null;
+            }
+
+     
       
   }
 
