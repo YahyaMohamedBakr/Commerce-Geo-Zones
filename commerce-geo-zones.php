@@ -36,7 +36,8 @@ function cgz_getClient(){
         $client->setApplicationName($app_name);
         $client->setScopes(Google_Service_Sheets::SPREADSHEETS);
         //PATH TO JSON FILE DOWNLOADED FROM GOOGLE CONSOLE FROM STEP 7
-        $client->setAuthConfig(get_option('credentials_file')); 
+        $client->setAuthConfig(ABSPATH.'wp-content/uploads/credentials/credentials.json'); 
+        //$c = $client->setAuthConfig(get_option('credentials_file'));
         //$client->setAccessType('offline');
         return $client;
     }
