@@ -41,16 +41,16 @@ function cgz_register_settings() {
     register_setting('cgz_options_group', 'cgz_enable_states');
     register_setting('cgz_options_group', 'cgz_enable_cities');
     register_setting('cgz_options_group', 'cgz_enable_admin');
-    register_setting('cgz_options_group', 'cgz_options_nonce');
+//    register_setting('cgz_options_group', 'cgz_options_nonce');
 
     
 }
 
-if (isset($_POST["credentials_file"]) && wp_verify_nonce($_POST['cgz_options_nonce'], 'save_cgz_options')) {
+// if (isset($_POST["credentials_file"]) && wp_verify_nonce($_POST['cgz_options_nonce'], 'save_cgz_options')) {
     
     
-    update_option('credentials_file', $_POST['credentials_file']);
-}
+//     update_option('credentials_file', $_POST['credentials_file']);
+// }
 
 
 function cgz_options_page() { ?>
@@ -59,7 +59,10 @@ function cgz_options_page() { ?>
         <form method="post"  action="options.php" >
             <?php settings_fields('cgz_options_group'); 
              do_settings_sections( 'cgz_options_group' ); 
-             wp_nonce_field( 'save_cgz_options', 'cgz_options_nonce' ); ?>
+            wp_nonce_field(); 
+           
+             
+             ?>
             <table class="form-table">
                 <tr>
                     <th><label for="app_name">Google Application Name:</label></th>
@@ -75,12 +78,13 @@ function cgz_options_page() { ?>
                 </tr>
                 
                 <tr>
-                    <th><label for="credentials_file">Google credentials file:</label></th>
+                <th><label for="credentials_file">Google credentials file:</label></th>
                     <td>
                         <textarea class="regular-text" name="credentials_file" id="credentials_file" style ="height:150px; <?php echo empty(get_option('credentials_file')) ? 'border: 1px solid red' : ''; ?>">
                             <?php echo  esc_attr(get_option('credentials_file')); ?>
                         </textarea>
                     </td>
+
                 </tr>
                 <tr>
                     <th><label for="cgz_enable_states">Enable states ?</label></th>
@@ -114,7 +118,28 @@ function cgz_options_page() { ?>
             <?php submit_button(); ?>
 
         </div>
-       
+       <script>
+//         jQuery(document).ready(function($) {
+//     $('#upload_button').on('click', function() {
+//         var file_frame = wp.media.frames.file_frame = wp.media({
+//             title: 'Select Google credentials file',
+//             button: {
+//                 text: 'Use this file'
+//             },
+//             multiple: false
+//         });
+
+//         file_frame.on('select', function() {
+//             var attachment = file_frame.state().get('selection').first().toJSON();
+//             $('#credentials_file').val(attachment.url);
+//             $('#uploaded_file').text(attachment.url);
+//         });
+
+//         file_frame.open();
+//     });
+// });
+
+       </script>
         <?php 
     }
     
