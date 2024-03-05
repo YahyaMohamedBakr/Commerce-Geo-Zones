@@ -1,6 +1,6 @@
 <?php  
 
-interface changeCity {
+interface Cgzones_changeCity {
 
     function cityDropdown( $fields );
     function addScript();
@@ -8,7 +8,7 @@ interface changeCity {
 
 }
 
-class client implements changeCity{
+class Cgzones_client implements Cgzones_changeCity{
      protected $fieldType;
 
 
@@ -49,7 +49,7 @@ class client implements changeCity{
 }
 
 
-class admin extends client{
+class Cgzones_admin extends Cgzones_client{
 
     function cityDropdown( $fields ){
         $order = wc_get_order();
@@ -100,8 +100,8 @@ class admin extends client{
         $selected_billing_state_value =$order->get_billing_state();
         $selected_shipping_state_value = $order->get_shipping_state();
     
-        wp_enqueue_script( 'cgz-admin-side-script', plugin_dir_url( __FILE__ ) . '/js/admin.js', array( 'jquery' ), '1.0', true );
-        wp_localize_script( 'cgz-admin-side-script', 'cgz_admin_side_script_vars', array(
+        wp_enqueue_script( 'cgzones-admin-side-script', plugin_dir_url( __FILE__ ) . '/js/admin.js', array( 'jquery' ), '1.0', true );
+        wp_localize_script( 'cgzones-admin-side-script', 'cgzones_admin_side_script_vars', array(
             //pass values to the script file
             'site_url' => get_site_url(),
             'selected_billing_city_name'=>$selected_billing_city_name,
