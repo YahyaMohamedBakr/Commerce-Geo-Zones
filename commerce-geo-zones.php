@@ -26,7 +26,9 @@ include_once('classes.php');
 function cgzones_getClient(){
   
 
-    $app_name = sanitize_text_field( wp_unslash (@$_POST['app_name']));
+    //$app_name = sanitize_text_field( wp_unslash (@$_POST['app_name']));
+
+    $app_name=get_option('app_name');
     try{
         $client = new Google_Client();
         $client->setApplicationName($app_name);

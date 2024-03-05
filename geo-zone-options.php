@@ -54,7 +54,7 @@ function cgzones_options_page() { ?>
         <form method="post"  action="options.php" >
             <?php settings_fields('cgzones_options_group'); 
              do_settings_sections( 'cgzones_options_group' ); 
-           
+           //  wp_nonce_field(); 
              
              ?>
             <table class="form-table">
