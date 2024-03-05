@@ -7,6 +7,7 @@ var selectShippingCityValue = cgzones_admin_side_script_vars.selected_shipping_c
 
 var selectBillingStateValue = cgzones_admin_side_script_vars.selected_billing_state_value;
 var selectShippingStateValue = cgzones_admin_side_script_vars.selected_shipping_state_value;
+var nonce = cgzones_admin_side_script_vars.nonce;
 
 function fillCities(select, options) {
     for(var option in options ) {
@@ -35,7 +36,7 @@ function getAreas(dropdownElement, stateId, defaultValue) {
     // waiting message until the data arrives 
     dropdownElement.appendChild(new Option('انتظر لحظات ....', '0'));
 
-    fetch(siteUrl+"/wp-json/cgzones/getareas?id="+(stateId-1))
+    fetch(siteUrl+"/wp-json/cgzones/getareas?id="+(stateId-1)+"&nonce="+nonce)
     .then((response) => response.json())
     .then((data) => {
 

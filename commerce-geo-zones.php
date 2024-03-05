@@ -101,10 +101,14 @@ if(get_option('cgzones_enable_states', true) && !empty(cgzones_getClient())){
     }   
 }
 
+include_once(ABSPATH.'wp-includes/pluggable.php');
+
+$nonce = wp_create_nonce( 'get_areas_nonce' );
+$$nonce_url= wp_nonce_url();
 
 
-$clientBilling= new Cgzones_client('billing_city');
-$clientShipping= new Cgzones_client('shipping_city');
+$clientBilling= new Cgzones_client('billing_city',$nonce);
+$clientShipping= new Cgzones_client('shipping_city',$nonce);
 
 
 //change city field to select element in client side
@@ -117,8 +121,8 @@ add_action( 'wp_enqueue_scripts', array ($clientShipping, 'addScript') );
 
 
 
-$adminBilling = new Cgzones_admin('billing_city');
-$adminShipping = new Cgzones_admin ('shipping_city');
+$adminBilling = new Cgzones_admin('billing_city',$nonce);
+$adminShipping = new Cgzones_admin ('shipping_city',$nonce);
 //admin side 
 
 if(get_option('cgzones_enable_admin', true)){
@@ -129,21 +133,28 @@ if(get_option('cgzones_enable_admin', true)){
 
 
 
+
 //endpoint for get areas
 add_action( 'rest_api_init', function () {
     register_rest_route( 'cgzones','/getareas', array(
       'methods' => 'GET',
       'callback' => 'cgzones_get_areas',
+      //'permission_callback' =>  'check_nonce' ,
       'permission_callback' => '__return_true'
     ));
   });
+//    function check_nonce( $request ) {
+//     // Verify the nonce and return the request or an error
+//     return rest_verify_request( $request );
+//   }
   
 
   function cgzones_get_areas(){
+    if (!wp_verify_nonce(-1,$_GET['nonce'])) return false;
       $data = getGoogleSheetData('COLUMNS')['COLUMNS'];
+
+    
         if (isset($_GET['id']) ) {
-           
-            $d= $data[$_GET['id']];
             return  $data[$_GET['id']] ;
             } else {
                 return null;

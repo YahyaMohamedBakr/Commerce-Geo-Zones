@@ -7,7 +7,7 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-== Description ==
+== Short Description ==
 Commerce Geo Zones is a powerful WooCommerce plugin that enhances your e-commerce experience by intelligently replacing traditional countries and cities with accurate geographical zones. This plugin leverages the capabilities of artificial intelligence to seamlessly integrate with Google Sheets, allowing you to effortlessly manage and update geo zones. Say goodbye to manual data entry and hello to a more efficient and streamlined process.
 
 = Key Features =

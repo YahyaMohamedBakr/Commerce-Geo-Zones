@@ -15,7 +15,7 @@ var siteUrl = custom_client_script_vars.site_url;
 var selectBillingCity = custom_client_script_vars.selected_billing_city;
 var selectShippingCity = custom_client_script_vars.selected_shipping_city;
 
-
+var nonce = custom_client_script_vars.nonce;
 
 
 function getAreas(dropdownElement, stateId, defaultValue) {
@@ -35,7 +35,11 @@ function getAreas(dropdownElement, stateId, defaultValue) {
     // waiting message until the data arrives 
     dropdownElement.appendChild(new Option('جارٍ تحميل المدن الخاصة بهذه المحافظة.......', '0'));
 
-    fetch(siteUrl+"/wp-json/cgzones/getareas?id="+(stateId-1))
+    fetch(siteUrl+"/wp-json/cgzones/getareas?id="+(stateId-1),{
+    headers: {
+        'X-WP-Nonce': nonce,
+    }},
+    )
     .then((response) => response.json())
 
     
