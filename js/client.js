@@ -35,10 +35,12 @@ function getAreas(dropdownElement, stateId, defaultValue) {
     // waiting message until the data arrives 
     dropdownElement.appendChild(new Option('جارٍ تحميل المدن الخاصة بهذه المحافظة.......', '0'));
 
-    fetch(siteUrl+"/wp-json/cgzones/getareas?id="+(stateId-1),{
-    headers: {
-        'X-WP-Nonce': nonce,
-    }},
+    fetch(siteUrl+"/wp-json/cgzones/getareas?id="+(stateId-1)+"&get_areas_wpnonce="+nonce,{
+        headers: {
+            'X-WP-Nonce': nonce,
+        },
+        credentials: 'include' 
+    }
     )
     .then((response) => response.json())
 
