@@ -12,8 +12,6 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
 
-use Automattic\Jetpack\Connection\Nonce_Handler;
-
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -105,9 +103,8 @@ if(get_option('cgzones_enable_states', true) && !empty(cgzones_getClient())){
 
 include_once(ABSPATH.'wp-includes/pluggable.php');
 
-$nonce = wp_create_nonce( 'get_areas_wpnonce');
-// $nonce_url= wp_nonce_url(get_site_url().'/wp-json/cgzones/getareas?id='.$id, 'get_id', '_wpnonce');
-// $nonce= explode( '_wpnonce=',$nonce_url)[1];
+$nonce = wp_create_nonce( 'get_areas_nonce' );
+
 
 $clientBilling= new Cgzones_client('billing_city',$nonce);
 $clientShipping= new Cgzones_client('shipping_city',$nonce);
@@ -141,29 +138,19 @@ add_action( 'rest_api_init', function () {
     register_rest_route( 'cgzones','/getareas', array(
       'methods' => 'GET',
       'callback' => 'cgzones_get_areas',
-     // 'permission_callback' =>  'check_nonce' ,
       'permission_callback' => '__return_true'
+      
     ));
   });
-//    function check_nonce( $request ) {
-//    // include_once(ABSPATH.'wp-includes/rest-api/class-wp-rest-server.php');
 
-//     // Verify the nonce and return the request or an error
-//     return rest_verify_request( $request );
-//   }
   
 
   function cgzones_get_areas(){
-    //if ( ! isset( $_GET['get_areas_wpnonce'] ) || ! wp_verify_nonce( $_GET['get_areas_wpnonce'], 'get_areas_wpnonce') ) {return false;}
-    // if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'],'get_id' ) ) {
-    //     return ;//new WP_Error( 'rest_cookie_invalid_nonce', __( 'Cookie check failed.' ), array( 'status' => 403 ) );
-    // }
-    
-    //if (!wp_verify_nonce(-1,$_GET['nonce'])) return false;
+    if (!wp_verify_nonce(-1,$_GET['nonce'])) return false;
       $data = getGoogleSheetData('COLUMNS')['COLUMNS'];
 
     
-        if (isset($_GET['id']) && wp_verify_nonce( $_GET['get_areas_wpnonce'], 'get_areas_wpnonce')) {
+        if (isset($_GET['id']) ) {
             return  $data[$_GET['id']] ;
             } else {
                 return null;
